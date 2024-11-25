@@ -1,0 +1,29 @@
+{
+    "categories": [
+      {
+        "label": "Even",
+        "rule": "even"
+      },
+      {
+        "label": "Prime",
+        "rule": "prime"
+      },
+      {
+        "label": "DivBy3",
+        "rule": "lambda x: x % 3 == 0"
+      },
+      {
+        "label": "Odd",
+        "rule": "odd"
+      },
+      {
+        "label": "DivBy7",
+        "rule": "lambda x: x % 7 == 0"
+      },
+      {
+        "label": "Non-Prime",
+        "rule": "lambda x: x > 1 and not all(x % i != 0 for i in range(2, int(x**0.5) + 1))"
+      }
+    ]
+  }
+  
