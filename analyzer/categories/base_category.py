@@ -1,4 +1,10 @@
-from analyzer.categories import Even, Odd, Prime, CustomCategory
+class BaseCategory:
+    def __init__(self, label):
+        self.label = label
+
+    def matches(self, number):
+        raise NotImplementedError("Subclasses must implement matches method")
+
 
 class NumberAnalyzer:
     def __init__(self, config):

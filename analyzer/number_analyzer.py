@@ -1,3 +1,5 @@
+# analyzer/number_analyzer.py
+
 from analyzer.categories import Even, Odd, Prime, CustomCategory
 
 class NumberAnalyzer:
