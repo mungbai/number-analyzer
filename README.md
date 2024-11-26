@@ -1,16 +1,153 @@
 # Number Analyzer
 
-## Overview
-
-**Number Analyzer** is a Python 3.10 application that analyzes numbers within a specified range and categorizes them based on predefined and custom rules. The application is configurable via a JSON file, allowing for flexible and dynamic categorization.
+A flexible Python tool for analyzing numbers within ranges based on configurable categories.
 
 ## Features
 
-- **Predefined Categories**: Even, Odd, Prime.
-- **Custom Categories**: Define your own rules using lambda expressions in a JSON configuration file.
-- **Modular Design**: Clean codebase adhering to Python best practices.
-- **Command-Line Interface**: Easy interaction via the terminal.
-- **Extensibility**: Easily add new categories or modify existing ones.
+- Analyze numbers based on multiple categories:
+  - Predefined categories (even, odd, prime)
+  - Custom categories using lambda expressions
+- Full support for Python's integer range capabilities:
+  - 32-bit systems: approximately ±2³¹ (±2.1 billion)
+  - 64-bit systems: approximately ±2⁶³ (±9.2 quintillion)
+- Smart range handling:
+  - Practical limit of 1 million numbers for performance
+  - Warning for ranges over 500 numbers
+  - Option to save large outputs to RTF files
+- Beautiful output formatting:
+  - Thousand separators for better readability (e.g., "1,234,567")
+  - RTF file output with Courier New font
+  - Clear error messages and warnings
+
+## Installation
+
+```bash
+git clone https://github.com/yourusername/number-analyzer.git
+cd number-analyzer
+pip install -r requirements.txt
+```
+
+## Usage
+
+### Basic Usage
+
+```bash
+# Analyze numbers from 1 to 100 (prints to console)
+python -m analyzer.main 1 100
+
+# Save analysis to specific file
+python -m analyzer.main 1 1000 -o results.rtf
+
+# Save analysis with custom file name
+python -m analyzer.main 1 1000 -o range_1_to_100.rtf # Custom file name
+
+# Save analysis to custom directory
+python -m analyzer.main 1 1000 -o custom_dir/results.rtf
+```
+
+By default, files are saved in the `output` directory if no path is specified. You can also specify a custom path in the `-o` argument.
+
+### Sample Output
+
+Console output:
+```
+1 to 100
+1: Even, Non-Prime
+2: Prime, Odd
+3: Even, DivBy3, Non-Prime
+...
+98: Even, Non-Prime
+99: Prime, Odd
+100: Even, Non-Prime
+
+or
+
+Results saved to: number-analyzer/output/results.rtf
+```
+
+RTF file output includes:
+- Courier New font for consistent spacing
+- Numbers formatted with thousand separators
+- One number per line with its categories
+- Clear header showing the analyzed range
+
+### File Organization
+
+The analyzer automatically organizes output files in a dedicated `output` directory:
+
+```
+output/
+├── range_1_to_100.rtf
+├── range_1_to_100_1.rtf    # Duplicate handling
+├── range_101_to_200.rtf
+└── custom_name.rtf
+```
+
+#### File Naming Convention
+- Default format: `range_[min]_to_[max].rtf`
+- Duplicate handling: Appends counter (e.g., `range_1_to_100_1.rtf`)
+- Custom names preserve extension (e.g., `custom_name_1.rtf`)
+
+## Configuration
+
+Create a `analyzer-config.json` file:
+
+```json
+{
+  "categories": [
+    {"label": "Even", "rule": "even"},
+    {"label": "Odd", "rule": "odd"},
+    {"label": "Prime", "rule": "prime"},
+    {"label": "DivBy3", "rule": "lambda x: x % 3 == 0"}
+  ]
+}
+```
+
+## Limitations and Warnings
+
+### System Limits
+- Maximum range depends on your Python installation:
+  - 32-bit: ±2.1 billion (±2³¹)
+  - 64-bit: ±9.2 quintillion (±2⁶³)
+
+### Practical Limits
+- Maximum recommended range: 1 million numbers
+- Warning threshold: 500 numbers
+- Larger ranges will trigger:
+  - Warning and file output option (>500 numbers)
+  - Error message (>1 million numbers)
+
+### Performance Considerations
+- Prime number checking becomes slower for very large numbers
+- Memory usage increases with range size
+- Consider using file output for ranges >500 numbers
+
+## Error Messages
+
+You might encounter these messages:
+
+```
+# System limit exceeded
+Error: Values must be between -9,223,372,036,854,775,808 and 9,223,372,036,854,775,807 on this system
+
+# Practical limit exceeded
+Error: Range size (1,500,000 numbers) exceeds practical limit of 1,000,000
+
+# Large range warning
+Warning: Large range detected (750 numbers). Would you like to save the output to a file? (y/n):
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch
+3. Commit your changes
+4. Push to the branch
+5. Create a new Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
 
 ## Table of Contents
 
@@ -29,145 +166,6 @@
 - **Python 3.10** or higher
 - **Git** (for cloning the repository)
 - **pip** (Python package installer)
-
-## Installation
-
-1. **Clone the Repository**
-
-   ```bash
-   git clone https://github.com/yourusername/number-analyzer.git
-   cd number-analyzer
-   ```
-
-2. **Create a Virtual Environment**
-
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   ```
-
-3. **Install Dependencies**
-
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-## Configuration
-
-The application uses a JSON configuration file named `analyzer-config.json` located at the root of the project. This file defines the categories and rules for number analysis.
-
-### **Sample `analyzer-config.json`**
-
-```json
-{
-  "categories": [
-    {
-      "label": "Even",
-      "rule": "even"
-    },
-    {
-      "label": "Prime",
-      "rule": "prime"
-    },
-    {
-      "label": "DivBy3",
-      "rule": "lambda x: x % 3 == 0"
-    },
-    {
-      "label": "Odd",
-      "rule": "odd"
-    },
-    {
-      "label": "DivBy7",
-      "rule": "lambda x: x % 7 == 0"
-    },
-    {
-      "label": "Non-Prime",
-      "rule": "lambda x: x > 1 and not all(x % i != 0 for i in range(2, int(x**0.5) + 1))"
-    }
-  ]
-}
-```
-
-- **Predefined Rules**: `"even"`, `"odd"`, `"prime"`
-- **Custom Rules**: Lambda expressions as strings, e.g., `"lambda x: x % 3 == 0"`
-
-## Usage
-
-Run the application using the `main.py` script inside the `analyzer` package.
-
-### **Basic Command**
-
-```bash
-python -m analyzer.main <min> <max>
-```
-
-- `<min>`: Minimum number in the range (inclusive)
-- `<max>`: Maximum number in the range (inclusive)
-
-### **Example**
-
-Analyze numbers from 10 to 15:
-
-```bash
-python -m analyzer.main 10 15
-```
-
-### **Sample Output**
-
-```
-10: Even
-11: Prime, Odd
-12: Even, DivBy3
-13: Prime, Odd
-14: Even, DivBy7
-15: DivBy3, Odd
-```
-
-## Examples
-
-### **Analyzing a Different Range**
-
-```bash
-python -m analyzer.main 1 5
-```
-
-**Output:**
-
-```
-1: Non-Prime, Odd
-2: Even, Prime
-3: Prime, DivBy3, Odd
-4: Even, Non-Prime
-5: Prime, Odd
-```
-
-### **Using Custom Categories**
-
-Modify `analyzer-config.json` to include a new category:
-
-```json
-{
-  "label": "Square",
-  "rule": "lambda x: int(x**0.5) ** 2 == x"
-}
-```
-
-Now, numbers that are perfect squares will be labeled as "Square".
-
-## Running Tests
-
-The project includes unit tests to ensure each component functions correctly.
-
-1. **Install Test Dependencies**
-
-   (Already included in `requirements.txt` if using `pytest`)
-
-2. **Run Tests**
-
-   ```bash
-   pytest
-   ```
 
 ## Project Structure
 
@@ -201,45 +199,26 @@ number-analyzer/
 ├── requirements.txt
 ├── README.md
 ├── .gitignore
+└── output/
+    ├── range_1_to_100.rtf
+    ├── range_1_to_100_1.rtf
+    ├── range_101_to_200.rtf
+    └── custom_name.rtf
 ```
 
-## Contributing
+## Running Tests
 
-Contributions are welcome! Please open an issue or submit a pull request for any improvements.
+The project includes unit tests to ensure each component functions correctly.
 
-### **Steps to Contribute**
+1. **Install Test Dependencies**
 
-1. **Fork the Repository**
+   (Already included in `requirements.txt` if using `pytest`)
 
-2. **Create a Feature Branch**
-
-   ```bash
-   git checkout -b feature/your-feature-name
-   ```
-
-3. **Commit Your Changes**
+2. **Run Tests**
 
    ```bash
-   git commit -am 'Add new feature'
+   pytest
    ```
-
-4. **Push to the Branch**
-
-   ```bash
-   git push origin feature/your-feature-name
-   ```
-
-5. **Open a Pull Request**
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-**Note**: Replace `yourusername` with your actual GitHub username in the installation instructions.
-
----
 
 ## Additional Information
 
